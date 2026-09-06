@@ -195,6 +195,20 @@ h1 {
     width: 160px;
 }
 
+.image-placeholder {
+    box-sizing: border-box;
+    height: 120px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e8efe2;
+    border: 1px solid #234B36;
+    color: #234B36;
+    font-weight: bold;
+}
+
 
 /* -------------------------
    FOOTER

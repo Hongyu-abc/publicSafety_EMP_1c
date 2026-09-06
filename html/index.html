@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Explore Yunnan’s wild mushroom names, local food culture, and mushroom safety through our educational project.">
+    <title>Yunnan Mushroom Awareness</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="subpages.css">
+    <link rel="stylesheet" href="home.css">
+</head>
+<body class="subpage home">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header>
+        <div class="header-logo">
+            <img src="images/logo.png" id="logo" alt="">
+            <h2>Yunnan Mushroom Awareness</h2>
+        </div>
+        <nav aria-label="Main navigation">
+            <a href="index.html" class="active" aria-current="page">Home</a>
+            <a href="mushrooms.html">Mushrooms</a>
+            <a href="safety.html">Safety</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+    <main id="main">
+        <!-- The video introduces the place; the sections below introduce the project. -->
+        <section class="home-hero" aria-labelledby="hero-title">
+            <video muted loop playsinline preload="metadata" id="home-video" aria-hidden="true" tabindex="-1">
+                <source src="images/Weixin Videos2026-09-05_154905_240.mp4" type="video/mp4">
+            </video>
+            <div class="hero-shade" aria-hidden="true"></div>
+            <div class="hero-copy">
+                <p class="eyebrow"><span lang="zh-Hans">云南菌子</span> / Yunnan mushrooms</p>
+                <h1 id="hero-title">Discover the wild<br>mushrooms of Yunnan.</h1>
+                <p class="hero-description">A world of local names, forest diversity, and food traditions.</p>
+                <a class="hero-button" href="mushrooms.html">Explore mushrooms <span aria-hidden="true">→</span></a>
+            </div>
+            <button class="video-toggle" type="button" aria-controls="home-video" hidden>Play background video</button>
+        </section>
+
+        <div class="home-content">
+            <section class="home-intro" aria-labelledby="intro-title">
+                <div><p class="eyebrow">Forest / Food / Culture</p><h2 id="intro-title">More than an ingredient.</h2></div>
+                <p>Wild mushrooms are part of Yunnan’s food culture and natural diversity. This project explores the names and stories behind them, alongside the care needed to understand their risks.</p>
+            </section>
+
+            <!-- Each card leads to a different part of the project. -->
+            <section class="home-paths" aria-label="Explore the project">
+                <a class="path-card" href="mushrooms.html">
+                    <span class="path-number">01 / Discover</span>
+                    <h2>Meet the mushrooms</h2>
+                    <p>From <span lang="zh-Hans">鸡枞</span> to <span lang="zh-Hans">见手青</span>, explore familiar names and follow the scientific references.</p>
+                    <span class="path-link">Browse the collection <span aria-hidden="true">↗</span></span>
+                </a>
+                <a class="path-card safety-card" href="safety.html">
+                    <span class="path-number">02 / Be aware</span>
+                    <h2>Know the risks</h2>
+                    <p>A name or photograph cannot tell you whether a mushroom is safe to eat. Learn about poisoning risks and when to seek help.</p>
+                    <span class="path-link">Read the safety guide <span aria-hidden="true">↗</span></span>
+                </a>
+                <a class="path-card" href="about.html">
+                    <span class="path-number">03 / Go deeper</span>
+                    <h2>Behind the project</h2>
+                    <p>Find our research sources, the context behind the numbers, and the questions we are still checking.</p>
+                    <span class="path-link">Explore our research <span aria-hidden="true">↗</span></span>
+                </a>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2026 Yunnan Mushroom Awareness</p>
+        <p>Education • Culture • Conservation • Safety</p>
+    </footer>
+    <script src="home.js"></script>
+</body>
+</html>

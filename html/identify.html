@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Upload a photograph of a wild mushroom and see the most likely species and what is known about its toxicity.">
+    <title>Check a photo before you ask anyone else. | Yunnan Mushroom Awareness</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="subpages.css">
+    <link rel="stylesheet" href="identify.css">
+</head>
+<body class="subpage identify">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header>
+        <div class="header-logo"><img src="images/logo.png" id="logo" alt=""><h2>Yunnan Mushroom Awareness</h2></div>
+        <nav aria-label="Main navigation"><a href="index.html">Home</a>
+<a href="mushrooms.html">Mushrooms</a>
+
+<a href="safety.html">Safety</a>
+<a href="identify.html" class="active" aria-current="page">Identify</a>
+<a href="about.html">About</a></nav>
+    </header>
+    <main id="main" class="page-wrap">
+        <div class="page-heading">
+            <p class="eyebrow">Yunnan / <span lang="zh-Hans">云南菌子</span></p>
+            <h1>Check a photo before you ask anyone else.</h1>
+            <p class="lede">Upload a photograph and our classifier will suggest the most likely species and what is known about its toxicity.</p>
+        </div>
+
+        <aside class="urgent">
+            <p class="eyebrow">Read this first</p>
+            <h2>A photograph cannot tell you what is safe to eat.</h2>
+            <p>This tool gives a suggestion, not a verdict. Many dangerous species are near-identical to edible ones in a photo, and more than 200 poisonous species grow in Yunnan. Never eat a wild mushroom on the strength of an image match.</p>
+            <p>If someone has already eaten a mushroom and you are worried, do not wait for symptoms — call <a href="tel:120">120</a>.</p>
+        </aside>
+
+        <!-- data-state on this wrapper is the single source of truth; identify.css does the showing and hiding. -->
+        <div class="identify-app" id="identify-app" data-state="empty">
+            <!-- Both live regions stay rendered in every state. See identify.css. -->
+            <p class="identify-status" id="identify-status" role="status" aria-live="polite" aria-atomic="true"></p>
+            <div class="identify-error urgent" id="identify-error" role="alert"></div>
+
+            <section aria-labelledby="upload-heading">
+                <div class="section-heading">
+                    <p class="eyebrow">01 / Upload</p>
+                    <h2 id="upload-heading">Add a photo</h2>
+                    <p>A clear, well-lit photo of the whole mushroom — cap, gills, and stem base — gives the classifier the most to work with.</p>
+                </div>
+
+                <div class="identify-drop" id="identify-drop">
+                    <label class="drop-title" for="identify-file">Drag a photo here</label>
+                    <p class="identify-hint" id="identify-hint">JPG, PNG, or WEBP. You can also press Enter to browse, or take a photo on your phone. Choose a photo before identifying.</p>
+                    <input class="identify-file" type="file" id="identify-file" accept="image/*" aria-describedby="identify-hint">
+                </div>
+
+                <div class="identify-preview">
+                    <img id="identify-preview-img" alt="">
+                    <div>
+                        <p class="identify-filename" id="identify-filename"></p>
+                        <p class="identify-filemeta" id="identify-filemeta"></p>
+                        <p class="preview-fallback" id="preview-fallback" hidden>This format cannot be previewed in your browser, but the photo can still be identified.</p>
+                        <p><button type="button" class="identify-remove" id="identify-remove">Remove photo</button></p>
+                    </div>
+                </div>
+
+                <div class="identify-actions">
+                    <button type="button" class="identify-button" id="identify-submit" disabled>Identify mushroom &rarr;</button>
+                </div>
+            </section>
+
+            <section id="identify-results" aria-labelledby="result-heading">
+                <div class="section-heading">
+                    <p class="eyebrow">02 / Result</p>
+                    <h2 id="result-heading" tabindex="-1">What the classifier found</h2>
+                </div>
+
+                <!-- Static skeletons. identify.js only writes textContent into them. -->
+                <div class="identify-result" id="identify-result">
+                    <div class="result-idle">
+                        <p>Nothing to show yet. Upload a photo above and select <strong>Identify mushroom</strong> — the result will appear here.</p>
+                    </div>
+
+                    <div class="result-loading">
+                        <p class="eyebrow">Analysing</p>
+                        <p>Reading the photo and comparing it against the reference set. This usually takes a few seconds.</p>
+                    </div>
+
+                    <div class="result-unavailable">
+                        <p class="eyebrow">Not connected</p>
+                        <p>The classifier backend is not connected yet, so no species can be returned. Everything else on this page is working — the photo was read and validated in your browser.</p>
+                        <p>To wire it up, fill in the body of <code>classifyImage(file)</code> in <code>identify.js</code>. Nothing else in that file talks to a backend.</p>
+                    </div>
+
+                    <aside class="result-card notice" id="result-card">
+                        <p class="risk-label" id="result-risk"></p>
+                        <h2 id="result-name"><span id="result-name-en"></span> <span lang="zh-Hans" id="result-name-zh"></span></h2>
+                        <p class="result-sci"><i id="result-sci"></i></p>
+                        <p id="result-note"></p>
+                        <p class="source">This is a suggestion from an image model, not an identification. <a href="safety.html">Read the safety guide &rarr;</a></p>
+                    </aside>
+                </div>
+            </section>
+        </div>
+
+        <div class="next-page"><span>Before you eat</span><a href="safety.html">Read the safety guide &rarr;</a></div>
+    </main>
+    <footer><p>&copy; 2026 Yunnan Mushroom Awareness</p><p>Education • Culture • Conservation • Safety</p></footer>
+    <script src="identify.js"></script>
+</body>
+</html>

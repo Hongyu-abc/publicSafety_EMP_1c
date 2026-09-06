@@ -1,0 +1,77 @@
+/* Identify-only layout; shared header, typography, and footer live in subpages.css. */
+
+/* Note on selectors: subpages.css styles `.subpage p` (0,1,1), which beats a
+   bare single-class rule. Anything overriding paragraph spacing below is
+   written as `.subpage .thing` (0,2,0) rather than reaching for !important. */
+
+/* Both live regions stay rendered in every state. A region that is display:none
+   when its text is written does not announce reliably, so they collapse to zero
+   size when empty instead of being taken out of the layout. */
+.subpage .identify-status { font-size: 14px; color: #606958; margin: 0 0 20px; }
+.subpage .identify-status:empty { margin: 0; }
+.identify-error { margin-bottom: 24px; }
+.identify-error:empty { padding: 0; border-left-width: 0; margin-bottom: 0; }
+
+/* The drop zone wraps a real file input, so clicking and keyboard use are native. */
+.identify-drop { position: relative; display: block; border: 2px dashed #b8c4ab; background: #fffef9; padding: 48px 28px; text-align: center; cursor: pointer; transition: background .15s, border-color .15s; }
+.identify-drop:hover, .identify-drop[data-drag="over"] { background: #ebeede; border-color: #778b4e; }
+/* The input is visually hidden, so draw its focus ring on the wrapper. */
+.identify-drop:focus-within { outline: 3px solid #b87930; outline-offset: 5px; }
+.drop-title { display: block; font-family: Georgia, serif; font-size: 24px; line-height: 1.25; margin-bottom: 10px; cursor: pointer; }
+.subpage .identify-hint { font-size: 14px; color: #606958; max-width: 440px; margin: 0 auto; }
+/* Clip the input rather than hiding it: display:none and visibility:hidden both
+   remove it from the tab order, which would make the zone mouse-only. */
+.identify-file { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+.identify-preview { display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: start; padding: 22px; background: #fffef9; border: 1px solid #dce0cf; }
+.identify-preview img { display: block; width: 100%; max-height: 320px; object-fit: contain; background: #e8efe2; border: 1px solid #dce0cf; }
+/* The rule above outranks the UA stylesheet, so [hidden] needs restating here. */
+.identify-preview img[hidden] { display: none; }
+.subpage .identify-filename { font-weight: bold; overflow-wrap: anywhere; margin-bottom: 4px; }
+.identify-filemeta, .preview-fallback { font-size: 14px; color: #606958; }
+
+.identify-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 24px; }
+.subpage .identify-button { font: inherit; font-weight: bold; padding: 14px 22px; border: 1px solid #234b36; border-radius: 3px; background: #234b36; color: #fffef6; cursor: pointer; transition: background .15s; }
+.subpage .identify-button:hover:not(:disabled) { background: #2d5c43; }
+.subpage .identify-button:disabled { background: #e5e7dc; color: #8a917f; border-color: #d5dccb; cursor: not-allowed; }
+.subpage .identify-remove { font: inherit; padding: 10px 16px; border: 1px solid #bcc5b0; border-radius: 3px; background: transparent; color: #243b2d; cursor: pointer; transition: background .15s; }
+.subpage .identify-remove:hover { background: #ebeede; }
+/* subpages.css only defines :focus-visible for a and summary. */
+.subpage button:focus-visible, .subpage input:focus-visible { outline: 3px solid #b87930; outline-offset: 5px; }
+
+/* Visibility is declarative: identify.js only writes data-state, never styles. */
+.identify-app[data-state="empty"] .identify-preview,
+.identify-app[data-state="error"] .identify-preview { display: none; }
+.identify-app:not([data-state="empty"]):not([data-state="error"]) .identify-drop { display: none; }
+.identify-result > * { display: none; }
+.identify-app[data-state="empty"] .result-idle,
+.identify-app[data-state="ready"] .result-idle,
+.identify-app[data-state="error"] .result-idle { display: block; }
+.identify-app[data-state="loading"] .result-loading { display: block; }
+.identify-app[data-state="unavailable"] .result-unavailable { display: block; }
+.identify-app[data-state="success"] .result-card { display: block; }
+
+/* The loading state is typographic. This design system has no spinner vocabulary. */
+.result-idle, .result-loading { background: #ebeede; border-left: 4px solid #bcc5b0; padding: 22px 26px; }
+.result-idle { color: #606958; }
+.result-unavailable { padding: 22px 26px; background: #fffef9; border: 1px dashed #bcc5b0; color: #606958; }
+.result-unavailable code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 14px; background: #ebeede; padding: 2px 6px; color: #3f5140; }
+
+.result-card h2 { margin-top: 6px; }
+.subpage .result-sci { font-size: 20px; font-family: Georgia, serif; margin: -8px 0 18px; }
+#result-heading { scroll-margin-top: 24px; }
+#result-heading:focus-visible { outline: 3px solid #b87930; outline-offset: 5px; }
+/* .risk-label is hard-coded red. Rendering an edible verdict in warning red misleads. */
+.subpage .risk-label.is-safe { color: #33613f; }
+
+@media (max-width: 800px) { .identify-preview { grid-template-columns: 1fr; } }
+@media (max-width: 520px) {
+    .identify-drop { padding: 32px 20px; }
+    .drop-title { font-size: 21px; }
+    .identify-actions { flex-direction: column; align-items: stretch; }
+    .subpage .identify-button, .subpage .identify-remove { width: 100%; }
+    .result-idle, .result-loading, .result-unavailable { padding: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .identify-drop, .subpage .identify-button, .subpage .identify-remove { transition: none; }
+}

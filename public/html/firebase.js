@@ -1,5 +1,6 @@
 import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
+import { getFunctions } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-functions.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDHdU2u0MYzWEVQ7CW_nxD2qtppZxsYixk",
@@ -11,12 +12,10 @@ const firebaseConfig = {
   measurementId: "G-MX3VMRWLH0"
 };
 
-// Reuse the existing app if this module is evaluated more than once.
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-
-// Analytics is only available in supported browser environments.
 const analytics = isSupported().then((supported) =>
   supported ? getAnalytics(app) : null
 );
+const functions = getFunctions(app, "us-central1");
 
-export { app, analytics };
+export { app, analytics, functions };

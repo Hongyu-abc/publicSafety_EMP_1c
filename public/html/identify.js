@@ -1,3 +1,7 @@
+import { httpsCallable } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-functions.js";
+import { functions } from "./firebase.js";
+import { getMushroomInfo } from "./mushroomInfo.js";
+
 // Photo upload and result rendering for the identify page.
 const app = document.getElementById('identify-app');
 const fileInput = document.getElementById('identify-file');
@@ -22,31 +26,52 @@ if (app && fileInput) {
     const DANGEROUS = ['deadly', 'poisonous'];
     const KNOWN_TOXICITY = ['deadly', 'poisonous', 'inedible', 'caution', 'edible', 'unknown'];
 
-    // ---------------------------------------------------------------
-    // INTEGRATION SEAM — replace the body of this function with the call
-    // to the classifier. Nothing else in this file talks to a backend.
-    //
-    // Takes a File. Resolves to an object shaped like this, which
-    // renderResult() below already knows how to draw:
-    //
-    //   {
-    //       commonNameEn:   'Death cap',
-    //       commonNameZh:   '致命鹅膏',
-    //       scientificName: 'Amanita exitialis',
-    //       toxicity:       'deadly',   // one of KNOWN_TOXICITY above
-    //       toxicityLabel:  'Deadly poisonous',
-    //       note:           'One paragraph about the species.'
-    //   }
-    //
-    // Resolve to null while the backend does not exist yet.
-    // Throw to show the visitor an error and let them retry.
-    //
-    // The Firebase SDK is ESM, so when this is wired up, change the tag in
-    // identify.html to <script type="module" src="identify.js"> and import
-    // inside this function. Nothing else in the file moves.
-    // ---------------------------------------------------------------
+    const identifyMushroom = httpsCallable(functions, 'identifyMushroom');
+
+    function readAsDataUrl(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.addEventListener('load', () => resolve(reader.result));
+            reader.addEventListener('error', () => reject(reader.error));
+            reader.readAsDataURL(file);
+        });
+    }
+
     async function classifyImage(file) {
-        return null;
+        const image = await readAsDataUrl(file);
+        const response = await identifyMushroom({ image });
+        return response.data;
+    }
+
+    function getWikipediaQuery(result) {
+        if (typeof result.scientificName === 'string' && result.scientificName.trim()) {
+            return result.scientificName.trim();
+        }
+
+        if (typeof result.commonNameEn !== 'string') return null;
+        const commonName = result.commonNameEn.trim();
+        return commonName === 'Identification unavailable' ? null : commonName;
+    }
+
+    async function enrichResultWithWikipedia(result) {
+        const query = getWikipediaQuery(result);
+        if (!query) return result;
+
+        try {
+            const information = await getMushroomInfo(query);
+            if (!information) return result;
+
+            return {
+                ...result,
+                commonNameEn: result.commonNameEn || information.title,
+                wikipediaSummary: information.summary,
+                wikipediaUrl: information.wikipediaUrl
+            };
+        } catch {
+            // Wikipedia is supplementary; a lookup failure must not hide the
+            // identifier result or make it appear that a mushroom is safe.
+            return result;
+        }
     }
 
     let state = 'empty';
@@ -100,6 +125,13 @@ if (app && fileInput) {
             return;
         }
 
+        if (file.size > 5 * 1024 * 1024) {
+            showError('Choose an image smaller than 5 MB.');
+            fileInput.value = '';
+            setState('error');
+            return;
+        }
+
         clearError();
         previewUrl = URL.createObjectURL(file);
         previewFallback.hidden = true;
@@ -132,7 +164,17 @@ if (app && fileInput) {
         document.getElementById('result-name-en').textContent = result.commonNameEn || 'Unnamed species';
         document.getElementById('result-name-zh').textContent = result.commonNameZh || '';
         document.getElementById('result-sci').textContent = result.scientificName || '';
-        document.getElementById('result-note').textContent = result.note || '';
+        document.getElementById('result-note').textContent = result.wikipediaSummary || result.note || '';
+
+        const wikipediaLink = document.getElementById('result-wikipedia');
+        const wikipediaSource = document.getElementById('result-source');
+        if (result.wikipediaUrl) {
+            wikipediaLink.href = result.wikipediaUrl;
+            wikipediaSource.hidden = false;
+        } else {
+            wikipediaLink.removeAttribute('href');
+            wikipediaSource.hidden = true;
+        }
     }
 
     // Focus first, scroll second: focus() scrolls on its own and would
@@ -154,7 +196,8 @@ if (app && fileInput) {
         revealResults();
 
         try {
-            const result = await classifyImage(file);
+            const classifierResult = await classifyImage(file);
+            const result = await enrichResultWithWikipedia(classifierResult);
             if (!result) {
                 setState('unavailable', 'The classifier backend is not connected yet.');
                 return;

@@ -1,32 +1,51 @@
+const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const logger = require("firebase-functions/logger");
+
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
 /**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ * Decodes and size-checks an image sent as a Base64 data URL.
+ * @param {string} base64Image Image data supplied by the callable client.
+ * @return {Buffer} The decoded image bytes.
  */
+function decodeImage(base64Image) {
+  if (typeof base64Image !== "string" || base64Image.length === 0) {
+    throw new HttpsError("invalid-argument", "No image provided.");
+  }
 
-// const {setGlobalOptions} = require("firebase-functions");
-// const {onRequest} = require("firebase-functions/https");
-// const logger = require("firebase-functions/logger");
+  const payload = base64Image.includes(",") ?
+    base64Image.slice(base64Image.indexOf(",") + 1) : base64Image;
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-// setGlobalOptions({maxInstances: 10});
+  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(payload) || payload.length % 4 !== 0) {
+    throw new HttpsError("invalid-argument", "The image data is invalid.");
+  }
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+  const imageBytes = Buffer.from(payload, "base64");
+  if (imageBytes.length === 0 || imageBytes.length > MAX_IMAGE_BYTES) {
+    throw new HttpsError(
+        "invalid-argument", "The image must be between 1 byte and 5 MB.");
+  }
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+  return imageBytes;
+}
+
+exports.identifyMushroom = onCall({maxInstances: 5}, (request) => {
+  const data = request.data || {};
+  const imageBytes = decodeImage(data.image);
+
+  logger.info("Received mushroom image for identification", {
+    imageBytes: imageBytes.length,
+  });
+
+  // Add a trained classifier model here. Until then, never guess whether a
+  // mushroom is safe to eat from an uploaded photograph.
+  return {
+    commonNameEn: "Identification unavailable",
+    commonNameZh: "暂无法识别",
+    scientificName: "",
+    toxicity: "unknown",
+    toxicityLabel: "Toxicity unknown",
+    note: "No trained mushroom classifier is connected yet. Do not eat a " +
+      "wild mushroom based on a photo.",
+  };
+});
